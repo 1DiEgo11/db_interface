@@ -1,14 +1,9 @@
-﻿using System.Drawing;
-
-namespace Interface
+﻿namespace Interface
 {
-    public class ConsoleRectangle
+    public class ConsoleDraw
     {
-       
         public static void Draw(int x, int y, int sizeX, int sizeY, ConsoleColor BorderColor)
         {
-
-            
             string s = "╔";
             string space = "";
             string temp = "";
@@ -32,6 +27,8 @@ namespace Interface
             Console.Write(s);
             Console.ResetColor();
         }
+
+        
     }
 }
 
