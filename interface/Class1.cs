@@ -7,7 +7,7 @@ namespace Interface
        
         public static void Draw(int x, int y, int sizeX, int sizeY, ConsoleColor BorderColor)
         {
-
+            //хай
             
             string s = "╔";
             string space = "";
