@@ -8,6 +8,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Button\Button.csproj" />
+    <ProjectReference Include="..\Button_Selector\Button_Selector.csproj" />
     <ProjectReference Include="..\interface\interface.csproj" />
   </ItemGroup>
 

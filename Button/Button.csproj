@@ -6,9 +6,4 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Button\Button.csproj" />
-    <ProjectReference Include="..\Button_Selector\Button_Selector.csproj" />
-  </ItemGroup>
-
 </Project>
