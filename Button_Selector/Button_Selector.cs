@@ -17,8 +17,7 @@ namespace Button_Selector
         public ConsoleColor SelectionColor;
         public int SelectedItem { get; private set; }
         private int _top;//Положение первой строки меню
-        public int x;
-        public int y;
+
 
         public void Show(bool addEmptyLineBefore = true)
         {

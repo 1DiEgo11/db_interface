@@ -1,6 +1,9 @@
 ﻿using Interface;
 
+
 Console.CursorVisible = false;
+
+
 
 ConsoleInterface.LogIn_Or_LogOn(53, 10);
 ConsoleInterface.Restaurants(53, 10);

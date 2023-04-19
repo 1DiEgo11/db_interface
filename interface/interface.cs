@@ -100,11 +100,8 @@ namespace Interface
                 Console.SetCursorPosition(x + 4, y + 6);
                 Console.WriteLine("Log On");
             }), command = 2};
-            var select = new ConsoleMenu(Button_LogIn, Button_LogOn)
-            {
-                x = x,
-                y = y
-            };
+            var select = new ConsoleMenu(Button_LogIn, Button_LogOn);
+            
 
             Window_Main(x - 15, y - 6, 20, 45);
             Console.SetCursorPosition(x + 1, y - 4);
@@ -145,11 +142,8 @@ namespace Interface
                 }),
                 command = 3
             };
-            var select = new ConsoleMenu(Button_north, Button_south, Button_west)
-            {
-                x = x,
-                y = y
-            };
+            var select = new ConsoleMenu(Button_north, Button_south, Button_west);
+
             Window_Main(x - 19, y - 6, 25, 55);
             Console.SetCursorPosition(x - 13, y - 3);
             Console.Write("Какой рестсоран <ЧешиНа> Вы хотите посетить?");
@@ -194,11 +188,8 @@ namespace Interface
                 }),
                 command = 3
             };
-            var select = new ConsoleMenu(Button_today, Button_tomorrow, Button_day_after_tomorrow)
-            {
-                x = x,
-                y = y
-            };
+            var select = new ConsoleMenu(Button_today, Button_tomorrow, Button_day_after_tomorrow);
+            
 
             Window_Main(x - 19, y - 6, 25, 55);
             Console.SetCursorPosition(x - 14, y - 3);
@@ -269,11 +260,8 @@ namespace Interface
                 }),
                 command = 3
             };
-            var select = new ConsoleMenu(Button_1000_1130, Button_1130_1300, Button_1300_1430, Button_1430_1600, Button_1600_1730, Button_1730_1900)
-            {
-                x = x,
-                y = y
-            };
+            var select = new ConsoleMenu(Button_1000_1130, Button_1130_1300, Button_1300_1430, Button_1430_1600, Button_1600_1730, Button_1730_1900);
+            
 
 
             Window_Main(x - 19, y - 3, 28, 53);
@@ -322,11 +310,7 @@ namespace Interface
                 }),
                 command = 3
             };
-            var select = new ConsoleMenu(Button_12, Button_25, Button_6)
-            {
-                x = x,
-                y = y
-            };
+            var select = new ConsoleMenu(Button_12, Button_25, Button_6);
 
             Window_Main(x - 19, y - 6, 25, 53);
 
