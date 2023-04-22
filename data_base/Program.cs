@@ -9,3 +9,5 @@ Console.Clear();
 ConsoleInterface.Time(53, 4);
 Console.Clear();
 ConsoleInterface.Table(53, 10);
+ConsoleInterface.LogIn(0,0);
+ConsoleInterface.LogOn(0,0);
