@@ -40,7 +40,7 @@ namespace Button_Selector
                     Console.ResetColor();
                     Console.ForegroundColor = ItemColor;
                 }
-                items[i].Method();
+                items[i].method();
             }
             Console.ResetColor();
             Console.ForegroundColor = ConsoleColor.DarkGray;
@@ -60,6 +60,7 @@ namespace Button_Selector
                     MoveUp();
                     break;
                 case ConsoleKey.Enter:
+                    items[SelectedItem].command();
                     break;
                 case ConsoleKey.Tab:
                     return;

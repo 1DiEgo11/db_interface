@@ -1,5 +1,6 @@
 ﻿using Button_Selector;
 using Button;
+using Checks;
 
 namespace Interface
 {
@@ -21,7 +22,6 @@ namespace Interface
                     else
                     {
                         Console.Write(' ');
-
                     }
                 }
                 y++;
@@ -46,7 +46,6 @@ namespace Interface
                     else
                     {
                         Console.Write(' ');
-
                     }
                 }
                 y++;
@@ -72,7 +71,6 @@ namespace Interface
                     else
                     {
                         Console.Write(' ');
-
                     }
                 }
                 Y++;
@@ -88,11 +86,12 @@ namespace Interface
 
         }
 
-        public static void LogIn_Or_LogOn(int x, int y)//регистрация или вход
+
+        public static void LogIn_Or_LogOn(int x, int y, string username, string password)//регистрация или вход
         {
             Window_Main(x, y, 20, 45);
-            x = x + 15;
-            y = y + 6;
+            x += 15;
+            y += 6;
             Console.SetCursorPosition(x + 1, y - 4);
             Console.Write("!!!WELCOME!!!");
             Window_Button(x, y);
@@ -101,36 +100,40 @@ namespace Interface
 
             var Button_LogIn = new Buttons
             {
-                Method = new Action(() =>
+                method = new Action(() =>
                 {
                     Console.SetCursorPosition(x + 4, y + 1);
                     Console.WriteLine("Log In");
                 }),
-                command = 1
+                command = new Action(() =>
+                {
+                    Console.Clear();
+                    Checks.Checks.LogIn(username, password);
+                })
             };
             var Button_LogOn = new Buttons
             {
-                Method = new Action(() =>
+                method = new Action(() =>
                 {
                     Console.SetCursorPosition(x + 4, y + 6);
                     Console.WriteLine("Log On");
                 }),
-                command = 2
+                command = new Action(() =>
+                {
+                    Console.Clear();
+                    Checks.Checks.LogOn(username, password);
+                })
             };
-            var select = new ConsoleMenu(Button_LogIn, Button_LogOn)
-            {
-                x = x,
-                y = y
-            };
+            var select = new ConsoleMenu(Button_LogIn, Button_LogOn);
 
             select.Show();
         }
 
-        public static void Restaurants(int x, int y)//выбор ресторана
+        public static void Restaurants(int x, int y, string s)//выбор ресторана
         {
             Window_Main(x, y, 25, 55);
-            x = x + 19;
-            y = y + 6;
+            x += 19;
+            y += 6;
             Console.SetCursorPosition(x - 13, y - 3);
             Console.Write("Какой рестсоран <ЧешиНа> Вы хотите посетить?");
             Window_Button(x, y);
@@ -144,45 +147,41 @@ namespace Interface
 
             var Button_north = new Buttons
             {
-                Method = new Action(() =>
+                method = new Action(() =>
                 {
                     Console.SetCursorPosition(x + 2, y + 1);
                     Console.Write("ЧешиНаСевер");
                 }),
-                command = 1
+                command = new Action(() => { s += '1'; })
             };
             var Button_south = new Buttons
             {
-                Method = new Action(() =>
+                method = new Action(() =>
                 {
                     Console.SetCursorPosition(x + 3, y + 6);
                     Console.Write("ЧешиНаЮг");
                 }),
-                command = 2
+                command = new Action(() =>{ s += '2'; })
             };
             var Button_west = new Buttons
             {
-                Method = new Action(() =>
+                method = new Action(() =>
                 {
                     Console.SetCursorPosition(x + 2, y + 11);
                     Console.Write("ЧешиНаЗапад");
                 }),
-                command = 3
+                command = new Action(() =>{ s += '3'; })
             };
-            var select = new ConsoleMenu(Button_north, Button_south, Button_west)
-            {
-                x = x,
-                y = y
-            };
+            var select = new ConsoleMenu(Button_north, Button_south, Button_west);
 
             select.Show();
         }
 
-        public static void Date(int x, int y)
+        public static void Date(int x, int y, string s)
         {
             Window_Main(x, y, 25, 55);
-            x = x + 19;
-            y = y + 6;
+            x += 19;
+            y += 6;
             Console.SetCursorPosition(x - 14, y - 3);
             Console.Write("Выберите день, когда хотите посетить ресторан:");
             Window_Button(x, y);
@@ -193,30 +192,30 @@ namespace Interface
 
             var Button_today = new Buttons
             {
-                Method = new Action(() =>
+                method = new Action(() =>
                 {
                     Console.SetCursorPosition(x + 4, y + 1);
                     Console.Write("Сегодня");
                 }),
-                command = 1
+                command = new Action(() => { s += '1'; })
             };
             var Button_tomorrow = new Buttons
             {
-                Method = new Action(() =>
+                method = new Action(() =>
                 {
                     Console.SetCursorPosition(x + 4, y + 6);
                     Console.Write("Завтра");
                 }),
-                command = 2
+                command = new Action(() => { s += '2'; })
             };
             var Button_day_after_tomorrow = new Buttons
             {
-                Method = new Action(() =>
+                method = new Action(() =>
                 {
                     Console.SetCursorPosition(x + 2, y + 11);
                     Console.Write("Послезавтра");
                 }),
-                command = 3
+                command = new Action(() => { s += '3'; })
             };
             var select = new ConsoleMenu(Button_today, Button_tomorrow, Button_day_after_tomorrow);
             
@@ -224,11 +223,11 @@ namespace Interface
             select.Show();
         }
 
-        public static void Time(int x, int y)
+        public static void Time(int x, int y, string s)
         {
             Window_Main(x, y, 28, 53);
-            x = x + 19;
-            y = y + 3;
+            x += 19;
+            y += 3;
             Console.SetCursorPosition(x, y - 2);
             Console.Write("Выберите время:");
             Window_Button(x, y);
@@ -244,71 +243,69 @@ namespace Interface
             Window_Button(x, y + 20);
             var Button_1000_1130 = new Buttons
             {
-                Method = new Action(() =>
+                method = new Action(() =>
                 {
                     Console.SetCursorPosition(x + 2, y + 1);
                     Console.Write("10:00-11:30");
                 }),
-                command = 1
+                command = new Action(() => { s += '1'; })
             };
             var Button_1130_1300 = new Buttons
             {
-                Method = new Action(() =>
+                method = new Action(() =>
                 {
 
                     Console.SetCursorPosition(x + 2, y + 5);
                     Console.Write("11:30-13:00");
                 }),
-                command = 2
+                command = new Action(() => { s += '2'; })
             };
             var Button_1300_1430 = new Buttons
             {
-                Method = new Action(() =>
+                method = new Action(() =>
                 {
                     Console.SetCursorPosition(x + 2, y + 9);
                     Console.Write("13:00-14:30");
                 }),
-                command = 3
+                command = new Action(() => { s += '3'; })
             };
             var Button_1430_1600 = new Buttons
             {
-                Method = new Action(() =>
+                method = new Action(() =>
                 {
                     Console.SetCursorPosition(x + 2, y + 13);
                     Console.Write("14:30-16:00");
                 }),
-                command = 1
+                command = new Action(() => { s += '4'; })
             };
             var Button_1600_1730 = new Buttons
             {
-                Method = new Action(() =>
+                method = new Action(() =>
                 {
                     Console.SetCursorPosition(x + 2, y + 17);
                     Console.Write("16:00-17:30");
                 }),
-                command = 2
+                command = new Action(() => { s += '5'; })
             };
             var Button_1730_1900 = new Buttons
             {
-                Method = new Action(() =>
+                method = new Action(() =>
                 {
                     Console.SetCursorPosition(x + 2, y + 21);
                     Console.Write("17:30-19:00");
                 }),
-                command = 3
+                command = new Action(() => { s += '6'; })
             };
             var select = new ConsoleMenu(Button_1000_1130, Button_1130_1300, Button_1300_1430, Button_1430_1600, Button_1600_1730, Button_1730_1900);
-            
-
-
+     
             select.Show();
         }
 
-        public static void Table(int x, int y)
+        public static void Table(int x, int y, string s)
         {
             Window_Main(x, y, 25, 53);
-            x = x + 19;
-            y = y + 6;
+            x += 19;
+            y += 6;
             Console.SetCursorPosition(x - 7, y - 2);
             Console.Write("На сколько человек бронируете?");
             Window_Button(x, y);
@@ -318,30 +315,30 @@ namespace Interface
             Window_Button(x, y + 10);
             var Button_12 = new Buttons
             {
-                Method = new Action(() =>
+                method = new Action(() =>
                 {
                     Console.SetCursorPosition(x + 6, y + 1);
                     Console.Write("1-2");
                 }),
-                command = 1
+                command = new Action(() => { s += '1'; })
             };
             var Button_25 = new Buttons
             {
-                Method = new Action(() =>
+                method = new Action(() =>
                 {
                     Console.SetCursorPosition(x + 6, y + 6);
                     Console.Write("2-5");
                 }),
-                command = 2
+                command = new Action(() => { s += '2'; })
             };
             var Button_6 = new Buttons
             {
-                Method = new Action(() =>
+                method = new Action(() =>
                 {
                     Console.SetCursorPosition(x + 7, y + 11);
                     Console.Write("5+");
                 }),
-                command = 3
+                command = new Action(() => { s += '3'; })
             };
             var select = new ConsoleMenu(Button_12, Button_25, Button_6);
 

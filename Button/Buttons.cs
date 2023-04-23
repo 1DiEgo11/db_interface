@@ -2,7 +2,7 @@
 {
     public class Buttons
     {
-        public Action Method;
-        public int command;
+        public Action method;
+        public Action command;
     }
 }
