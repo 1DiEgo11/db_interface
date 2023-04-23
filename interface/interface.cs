@@ -357,5 +357,27 @@ namespace Interface
 
             select.Show();
         }
+        public static void LogIn(int x, int y)
+        {
+            Console.SetCursorPosition(x,y);
+            Window_Main(x, y, 17, 43);//53
+            x = x + 18;
+            y = y + 2;
+            Console.SetCursorPosition(x, y);
+            Console.Write("LOG IN");
+            Console.SetCursorPosition(x-5, y+2);
+            Console.Write("Имя пользователя:");
+            Console.SetCursorPosition(x-4, y + 3);
+            Console.Write("(3-20 символов)");
+            Console.SetCursorPosition(x-2, y+5);
+            string? name = Console.ReadLine();
+            Console.SetCursorPosition(x, y+7);
+            Console.Write("Пароль:");
+            Console.SetCursorPosition(x-4,y+8);
+            Console.Write("(5-15 символов)");
+            Console.SetCursorPosition(x-2,y+9);
+            string? password = Console.ReadLine();
+
+        }
     }
 }
