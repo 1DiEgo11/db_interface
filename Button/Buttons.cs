@@ -1,5 +1,6 @@
 ﻿namespace Button
 {
+    
     public class Buttons
     {
         public Action method;

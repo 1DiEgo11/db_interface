@@ -62,8 +62,6 @@ namespace Button_Selector
                 case ConsoleKey.Enter:
                     items[SelectedItem].command();
                     break;
-                case ConsoleKey.Tab:
-                    return;
             }
         }
 

@@ -4,8 +4,10 @@ using Checks;
 
 namespace Interface
 {
+   
     public class ConsoleInterface
     {
+       
         public static void Window_Button(int x, int y)//отрисовка рамки для кнопки
         {
             int line = 3;
@@ -86,8 +88,59 @@ namespace Interface
 
         }
 
+        public static void LogIn(int x, int y, string username, string password)
+        {
+            do
+            {
+                Console.Clear();
+                Console.SetCursorPosition(x, y);
+                Window_Main(x, y, 17, 43);//53
+                Console.SetCursorPosition(x + 18, y + 2);
+                Console.Write("LOG IN");
+                Console.SetCursorPosition(x + 13, y + 4);
+                Console.Write("Имя пользователя:");
+                Console.SetCursorPosition(x + 14, y + 5);
+                Console.Write("(3-10 символов)");
+                Console.SetCursorPosition(x + 16, y + 7);
+                username = Console.ReadLine();
+                //Отсылаем в базу данных для проверки, что бы проверить не совпадает ли он с каким то из сущесвующих
+                Console.SetCursorPosition(x + 18, y + 9);
+                Console.Write("Пароль:");
+                Console.SetCursorPosition(x + 14, y + 10);
+                Console.Write("(5-10 символов)");
+                Console.SetCursorPosition(x + 16, y + 11);
+                password = Console.ReadLine();
+            }while (Checks.Checks.Check_Login(username) == false || Checks.Checks.Check_newPassword(password) == false);
+        }
 
-        public static void LogIn_Or_LogOn(int x, int y, string username, string password)//регистрация или вход
+        public static void LogOn(int x, int y, string username, string password)
+        {
+            string password_fromBase;
+            do
+            {
+                Console.Clear();
+                Console.SetCursorPosition(x, y);
+                Window_Main(x, y, 17, 43);//53
+                Console.SetCursorPosition(x + 18, y + 2);
+                Console.Write("LOG ON");
+                Console.SetCursorPosition(x + 13, y + 4);
+                Console.Write("Имя пользователя:");
+                Console.SetCursorPosition(x + 14, y + 5);
+                Console.Write("(3-10 символов)");
+                Console.SetCursorPosition(x + 16, y + 7);
+                username = Console.ReadLine();
+                //Отсылаем в базу данных для проверки, существует ли такой логин
+                Console.SetCursorPosition(x + 18, y + 9);
+                Console.Write("Пароль:");
+                Console.SetCursorPosition(x + 14, y + 10);
+                Console.Write("(5-10 символов)");
+                Console.SetCursorPosition(x + 16, y + 11);
+                password = Console.ReadLine();
+                password_fromBase = "Admin123";// тут база присылает пароль для сравнения
+            } while (Checks.Checks.Check_Login(username) == false || Checks.Checks.Check_Password(password, password_fromBase) == false);
+        }
+
+        public static string LogIn_Or_LogOn(int x, int y, string username, string password)//регистрация или вход
         {
             Window_Main(x, y, 20, 45);
             x += 15;
@@ -100,6 +153,7 @@ namespace Interface
 
             var Button_LogIn = new Buttons
             {
+                
                 method = new Action(() =>
                 {
                     Console.SetCursorPosition(x + 4, y + 1);
@@ -108,11 +162,12 @@ namespace Interface
                 command = new Action(() =>
                 {
                     Console.Clear();
-                    Checks.Checks.LogIn(username, password);
+                    LogIn(x - 15, y - 6, username, password);
                 })
             };
             var Button_LogOn = new Buttons
             {
+                
                 method = new Action(() =>
                 {
                     Console.SetCursorPosition(x + 4, y + 6);
@@ -121,15 +176,16 @@ namespace Interface
                 command = new Action(() =>
                 {
                     Console.Clear();
-                    Checks.Checks.LogOn(username, password);
+                    LogOn(x - 15, y - 6, username, password);
                 })
             };
             var select = new ConsoleMenu(Button_LogIn, Button_LogOn);
 
             select.Show();
+            return username;
         }
 
-        public static void Restaurants(int x, int y, string s)//выбор ресторана
+        public static string Restaurants(int x, int y, string s)//выбор ресторана
         {
             Window_Main(x, y, 25, 55);
             x += 19;
@@ -144,7 +200,7 @@ namespace Interface
 
             Console.SetCursorPosition(x - 10, y + 14);
             Console.Write("<ЧешиНа> - сеть ресторанов Чешской кухни");
-
+            
             var Button_north = new Buttons
             {
                 method = new Action(() =>
@@ -152,16 +208,17 @@ namespace Interface
                     Console.SetCursorPosition(x + 2, y + 1);
                     Console.Write("ЧешиНаСевер");
                 }),
-                command = new Action(() => { s += '1'; })
+                command = new Action(() => { s += "1/"; })
             };
             var Button_south = new Buttons
             {
+                
                 method = new Action(() =>
                 {
                     Console.SetCursorPosition(x + 3, y + 6);
                     Console.Write("ЧешиНаЮг");
                 }),
-                command = new Action(() =>{ s += '2'; })
+                command = new Action(() => { s += "2/"; })
             };
             var Button_west = new Buttons
             {
@@ -170,14 +227,15 @@ namespace Interface
                     Console.SetCursorPosition(x + 2, y + 11);
                     Console.Write("ЧешиНаЗапад");
                 }),
-                command = new Action(() =>{ s += '3'; })
+                command = new Action(() =>{ s += "3/"; })
             };
             var select = new ConsoleMenu(Button_north, Button_south, Button_west);
 
             select.Show();
+            return s;
         }
 
-        public static void Date(int x, int y, string s)
+        public static string Date(int x, int y, string s)
         {
             Window_Main(x, y, 25, 55);
             x += 19;
@@ -197,7 +255,7 @@ namespace Interface
                     Console.SetCursorPosition(x + 4, y + 1);
                     Console.Write("Сегодня");
                 }),
-                command = new Action(() => { s += '1'; })
+                command = new Action(() => { s += "1/"; })
             };
             var Button_tomorrow = new Buttons
             {
@@ -206,7 +264,7 @@ namespace Interface
                     Console.SetCursorPosition(x + 4, y + 6);
                     Console.Write("Завтра");
                 }),
-                command = new Action(() => { s += '2'; })
+                command = new Action(() => { s += "2/"; })
             };
             var Button_day_after_tomorrow = new Buttons
             {
@@ -215,15 +273,16 @@ namespace Interface
                     Console.SetCursorPosition(x + 2, y + 11);
                     Console.Write("Послезавтра");
                 }),
-                command = new Action(() => { s += '3'; })
+                command = new Action(() => { s += "3/"; })
             };
             var select = new ConsoleMenu(Button_today, Button_tomorrow, Button_day_after_tomorrow);
             
 
             select.Show();
+            return s;
         }
 
-        public static void Time(int x, int y, string s)
+        public static string Time(int x, int y, string s)
         {
             Window_Main(x, y, 28, 53);
             x += 19;
@@ -248,7 +307,7 @@ namespace Interface
                     Console.SetCursorPosition(x + 2, y + 1);
                     Console.Write("10:00-11:30");
                 }),
-                command = new Action(() => { s += '1'; })
+                command = new Action(() => { s += "1/"; })
             };
             var Button_1130_1300 = new Buttons
             {
@@ -258,7 +317,7 @@ namespace Interface
                     Console.SetCursorPosition(x + 2, y + 5);
                     Console.Write("11:30-13:00");
                 }),
-                command = new Action(() => { s += '2'; })
+                command = new Action(() => { s += "2/"; })
             };
             var Button_1300_1430 = new Buttons
             {
@@ -267,7 +326,7 @@ namespace Interface
                     Console.SetCursorPosition(x + 2, y + 9);
                     Console.Write("13:00-14:30");
                 }),
-                command = new Action(() => { s += '3'; })
+                command = new Action(() => { s += "3/"; })
             };
             var Button_1430_1600 = new Buttons
             {
@@ -276,7 +335,7 @@ namespace Interface
                     Console.SetCursorPosition(x + 2, y + 13);
                     Console.Write("14:30-16:00");
                 }),
-                command = new Action(() => { s += '4'; })
+                command = new Action(() => { s += "4/"; })
             };
             var Button_1600_1730 = new Buttons
             {
@@ -285,7 +344,7 @@ namespace Interface
                     Console.SetCursorPosition(x + 2, y + 17);
                     Console.Write("16:00-17:30");
                 }),
-                command = new Action(() => { s += '5'; })
+                command = new Action(() => { s += "5/"; })
             };
             var Button_1730_1900 = new Buttons
             {
@@ -294,14 +353,15 @@ namespace Interface
                     Console.SetCursorPosition(x + 2, y + 21);
                     Console.Write("17:30-19:00");
                 }),
-                command = new Action(() => { s += '6'; })
+                command = new Action(() => { s += "6/"; })
             };
             var select = new ConsoleMenu(Button_1000_1130, Button_1130_1300, Button_1300_1430, Button_1430_1600, Button_1600_1730, Button_1730_1900);
      
             select.Show();
+            return s;
         }
 
-        public static void Table(int x, int y, string s)
+        public static string Table(int x, int y, string s)
         {
             Window_Main(x, y, 25, 53);
             x += 19;
@@ -320,7 +380,7 @@ namespace Interface
                     Console.SetCursorPosition(x + 6, y + 1);
                     Console.Write("1-2");
                 }),
-                command = new Action(() => { s += '1'; })
+                command = new Action(() => { s += "1"; })
             };
             var Button_25 = new Buttons
             {
@@ -329,7 +389,7 @@ namespace Interface
                     Console.SetCursorPosition(x + 6, y + 6);
                     Console.Write("2-5");
                 }),
-                command = new Action(() => { s += '2'; })
+                command = new Action(() => { s += "2"; })
             };
             var Button_6 = new Buttons
             {
@@ -338,33 +398,12 @@ namespace Interface
                     Console.SetCursorPosition(x + 7, y + 11);
                     Console.Write("5+");
                 }),
-                command = new Action(() => { s += '3'; })
+                command = new Action(() => {  s += "3"; })
             };
             var select = new ConsoleMenu(Button_12, Button_25, Button_6);
 
             select.Show();
-        }
-        public static void LogIn(int x, int y)
-        {
-            Console.SetCursorPosition(x,y);
-            Window_Main(x, y, 17, 43);//53
-            x = x + 18;
-            y = y + 2;
-            Console.SetCursorPosition(x, y);
-            Console.Write("LOG IN");
-            Console.SetCursorPosition(x-5, y+2);
-            Console.Write("Имя пользователя:");
-            Console.SetCursorPosition(x-4, y + 3);
-            Console.Write("(3-20 символов)");
-            Console.SetCursorPosition(x-2, y+5);
-            string? name = Console.ReadLine();
-            Console.SetCursorPosition(x, y+7);
-            Console.Write("Пароль:");
-            Console.SetCursorPosition(x-4,y+8);
-            Console.Write("(5-15 символов)");
-            Console.SetCursorPosition(x-2,y+9);
-            string? password = Console.ReadLine();
-
-        }
+            return s;
+        }    
     }
 }
