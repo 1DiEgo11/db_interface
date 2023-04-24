@@ -1,13 +1,23 @@
 ﻿using Button_Selector;
 using Button;
 using Checks;
+using Users;
+using System.Diagnostics;
 
 namespace Interface
 {
    
     public class ConsoleInterface
     {
-       
+        public static string Booking(int x, int y, string s)
+        {
+            s = Restaurants(x, y, s);
+            s = Date(x, y, s);
+            s = Time(x, y, s);
+            s = Table(x, y, s);
+            return s;
+        }
+
         public static void Window_Button(int x, int y)//отрисовка рамки для кнопки
         {
             int line = 3;
@@ -56,8 +66,56 @@ namespace Interface
             }
         }
 
-        public static void Dropdown_Menu(int x, int y)//выпадающее окно
+        public static string Dropdown_Menu(int x, int y, string s, User user)//выпадающее окно
         {
+            var Button_north = new Buttons
+            {
+                method = new Action(() =>
+                {
+                    Console.SetCursorPosition(x + 3, y + 2);
+                    Console.Write("Мои брони");
+                }),
+                command = new Action(() => 
+                {
+                    Console.Clear();
+                    if ( user.bookings != null)
+                    {
+                        foreach (var book in user.bookings)
+                        {
+                            Console.WriteLine(book.Restaurant + " " + book.Date + " " + book.Time + " " + book.Table);
+                        }
+                        Console.ReadLine();
+                    }
+                    else { Console.WriteLine("У вас нет броней(Нажмите ENTER)"); Console.ReadLine(); }
+                    
+                }) // запрашиваем брони из бд
+            };
+            var Button_south = new Buttons
+            {
+
+                method = new Action(() =>
+                {
+                    Console.SetCursorPosition(x + 3, y + 6);
+                    Console.Write("Новая бронь");
+                }),
+                command = new Action(() => { s = Booking(x, y, s); })
+            };
+            var Button_west = new Buttons
+            {
+                method = new Action(() =>
+                {
+                    Console.SetCursorPosition(x + 3, y + 10);
+                    Console.Write("Выход");
+                }),
+                command = new Action(() => 
+                {
+                    Console.Clear();
+                    Console.WriteLine("До свидания!");
+                    Process.GetCurrentProcess().Kill();
+                })
+            };
+            var select = new ConsoleMenu(Button_north, Button_south, Button_west);
+
             int line = 13;
             int column = 30;
             int Y = y;
@@ -79,16 +137,13 @@ namespace Interface
                 Console.WriteLine();
                 Console.SetCursorPosition(x, Y);
             }
-            Console.SetCursorPosition(x + 3, y + 2);
-            Console.Write("Кнопка 1");
-            Console.SetCursorPosition(x + 3, y + 6);
-            Console.Write("Кнопка 2");
-            Console.SetCursorPosition(x + 3, y + 10);
-            Console.Write("Кнопка 3");
 
+            select.Show();
+            Console.Clear();
+            return s;
         }
 
-        public static void LogIn(int x, int y, string username, string password)
+        public static User LogOn(int x, int y, string username, string password)
         {
             do
             {
@@ -96,7 +151,7 @@ namespace Interface
                 Console.SetCursorPosition(x, y);
                 Window_Main(x, y, 17, 43);//53
                 Console.SetCursorPosition(x + 18, y + 2);
-                Console.Write("LOG IN");
+                Console.Write("LOG ON");
                 Console.SetCursorPosition(x + 13, y + 4);
                 Console.Write("Имя пользователя:");
                 Console.SetCursorPosition(x + 14, y + 5);
@@ -111,9 +166,12 @@ namespace Interface
                 Console.SetCursorPosition(x + 16, y + 11);
                 password = Console.ReadLine();
             }while (Checks.Checks.Check_Login(username) == false || Checks.Checks.Check_newPassword(password) == false);
+            //Тут отправляем в базу данных имя пользователя и пароль и база данных записывает в список юзеров
+            var user = new User(username, password);
+            return user;
         }
 
-        public static void LogOn(int x, int y, string username, string password)
+        public static User LogIn(int x, int y, string username, string password)
         {
             string password_fromBase;
             do
@@ -122,7 +180,7 @@ namespace Interface
                 Console.SetCursorPosition(x, y);
                 Window_Main(x, y, 17, 43);//53
                 Console.SetCursorPosition(x + 18, y + 2);
-                Console.Write("LOG ON");
+                Console.Write("LOG IN");
                 Console.SetCursorPosition(x + 13, y + 4);
                 Console.Write("Имя пользователя:");
                 Console.SetCursorPosition(x + 14, y + 5);
@@ -138,9 +196,11 @@ namespace Interface
                 password = Console.ReadLine();
                 password_fromBase = "Admin123";// тут база присылает пароль для сравнения
             } while (Checks.Checks.Check_Login(username) == false || Checks.Checks.Check_Password(password, password_fromBase) == false);
+            var user = new User(username, password);
+            return user;
         }
 
-        public static string LogIn_Or_LogOn(int x, int y, string username, string password)//регистрация или вход
+        public static User LogIn_Or_LogOn(int x, int y, string username, string password, User user)//регистрация или вход
         {
             Window_Main(x, y, 20, 45);
             x += 15;
@@ -162,7 +222,7 @@ namespace Interface
                 command = new Action(() =>
                 {
                     Console.Clear();
-                    LogIn(x - 15, y - 6, username, password);
+                    user = LogIn(x - 15, y - 6, username, password);
                 })
             };
             var Button_LogOn = new Buttons
@@ -176,13 +236,14 @@ namespace Interface
                 command = new Action(() =>
                 {
                     Console.Clear();
-                    LogOn(x - 15, y - 6, username, password);
+                    user = LogOn(x - 15, y - 6, username, password);
                 })
             };
             var select = new ConsoleMenu(Button_LogIn, Button_LogOn);
 
             select.Show();
-            return username;
+            Console.Clear();
+            return user;
         }
 
         public static string Restaurants(int x, int y, string s)//выбор ресторана
@@ -232,6 +293,7 @@ namespace Interface
             var select = new ConsoleMenu(Button_north, Button_south, Button_west);
 
             select.Show();
+            Console.Clear();
             return s;
         }
 
@@ -279,6 +341,7 @@ namespace Interface
             
 
             select.Show();
+            Console.Clear();
             return s;
         }
 
@@ -358,6 +421,7 @@ namespace Interface
             var select = new ConsoleMenu(Button_1000_1130, Button_1130_1300, Button_1300_1430, Button_1430_1600, Button_1600_1730, Button_1730_1900);
      
             select.Show();
+            Console.Clear();
             return s;
         }
 
@@ -403,6 +467,7 @@ namespace Interface
             var select = new ConsoleMenu(Button_12, Button_25, Button_6);
 
             select.Show();
+            Console.Clear();
             return s;
         }    
     }
