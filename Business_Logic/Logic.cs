@@ -45,23 +45,25 @@ namespace Business_Logic
             //    }
             //};
             //Запрашиваем брони userа и записываем в user.bookings
-            //while (true)
-            //{
-            //    //command = ConsoleInterface.Dropdown_Menu(x, y, command, user);
-            //    byte[] send = Encoding.UTF8.GetBytes(command);
-            //    stream.Write(send, 0, send.Length);
-            //    stream.Flush();
 
-            //    byte[] reads = new byte[1024];
-            //    int lenght = stream.Read(reads, 0, reads.Length);
-            //    answer = Encoding.UTF8.GetString(reads, 0, lenght);
-            //    Console.WriteLine(answer);
-            //    command = "";
-            //    //Отсылаем бронь на проверку
-            //    //Если проверку прошла записываем в бд
-            //    //Ели не прошла, отсылаем fallse и я вывожу текст о том что бронь занята   
-            //}
-             
+
+            while (true)
+            {
+                //command = ConsoleInterface.Dropdown_Menu(x, y, command, user);
+                byte[] send = Encoding.UTF8.GetBytes(command);
+                stream.Write(send, 0, send.Length);
+                stream.Flush();
+
+                byte[] reads = new byte[1024];
+                int lenght = stream.Read(reads, 0, reads.Length);
+                answer = Encoding.UTF8.GetString(reads, 0, lenght);
+                Console.WriteLine(answer);
+                command = "";
+                //Отсылаем бронь на проверку
+                //Если проверку прошла записываем в бд
+                //Ели не прошла, отсылаем fallse и я вывожу текст о том что бронь занята   
+            }
+
         }
     }
 }
