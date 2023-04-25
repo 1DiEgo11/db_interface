@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Client-Server\Client-Server.csproj" />
     <ProjectReference Include="..\interface\interface.csproj" />
     <ProjectReference Include="..\Users\Users.csproj" />
   </ItemGroup>

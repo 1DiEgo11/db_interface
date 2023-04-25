@@ -3,6 +3,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using Users;
+using Client_Server;
 
 namespace Business_Logic
 {
@@ -11,13 +12,10 @@ namespace Business_Logic
 
         public static void Logics(int x, int y)
         {
-            IPHostEntry ipHost = Dns.GetHostEntry("localhost");
-            IPAddress ipAddr = ipHost.AddressList[1];
-            IPEndPoint ipEndPoint = new(ipAddr, 8081);
 
-            Socket socket = new(ipAddr.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+            TcpClient client = new("127.0.0.1", 7000);
 
-            socket.Connect(ipEndPoint);
+            NetworkStream stream = client.GetStream();
 
             string command = "";
             string username = "";
@@ -26,7 +24,16 @@ namespace Business_Logic
             ConsoleKeyInfo keyInfo = new();
 
 
-            user = ConsoleInterface.LogIn_Or_LogOn(x, y, username, password, user);
+            //user = ConsoleInterface.LogIn_Or_LogOn(x, y, username, password, user);
+            string answer = ReceivingAndSending.Receiving(stream);
+            Console.WriteLine(answer);
+            Console.ReadLine();
+
+            string s = "Привет";
+            ReceivingAndSending.Sending(stream, s);
+
+
+
             //user.bookings = new List<Booking>
             //{
             //    new Booking
@@ -38,16 +45,22 @@ namespace Business_Logic
             //    }
             //};
             //Запрашиваем брони userа и записываем в user.bookings
-            while (true)
-            {
-                command = ConsoleInterface.Dropdown_Menu(x, y, command, user);
-                byte[] send = Encoding.UTF8.GetBytes(command);
-                socket.Send(send);
-                command = "";
-                //Отсылаем бронь на проверку
-                //Если проверку прошла записываем в бд
-                //Ели не прошла, отсылаем fallse и я вывожу текст о том что бронь занята   
-            }
+            //while (true)
+            //{
+            //    //command = ConsoleInterface.Dropdown_Menu(x, y, command, user);
+            //    byte[] send = Encoding.UTF8.GetBytes(command);
+            //    stream.Write(send, 0, send.Length);
+            //    stream.Flush();
+
+            //    byte[] reads = new byte[1024];
+            //    int lenght = stream.Read(reads, 0, reads.Length);
+            //    answer = Encoding.UTF8.GetString(reads, 0, lenght);
+            //    Console.WriteLine(answer);
+            //    command = "";
+            //    //Отсылаем бронь на проверку
+            //    //Если проверку прошла записываем в бд
+            //    //Ели не прошла, отсылаем fallse и я вывожу текст о том что бронь занята   
+            //}
              
         }
     }
