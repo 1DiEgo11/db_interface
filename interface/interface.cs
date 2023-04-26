@@ -3,6 +3,8 @@ using Button;
 using Checks;
 using Users;
 using System.Diagnostics;
+using Client_Server;
+using System.Net.Sockets;
 
 namespace Interface
 {
@@ -68,7 +70,7 @@ namespace Interface
 
         public static string Dropdown_Menu(int x, int y, string s, User user)//выпадающее окно
         {
-            var Button_north = new Buttons
+            var Button_my = new Buttons
             {
                 method = new Action(() =>
                 {
@@ -78,7 +80,7 @@ namespace Interface
                 command = new Action(() => 
                 {
                     Console.Clear();
-                    if ( user.bookings != null)
+                    if ( user.bookings.Count > 0)
                     {
                         foreach (var book in user.bookings)
                         {
@@ -88,9 +90,9 @@ namespace Interface
                     }
                     else { Console.WriteLine("У вас нет броней(Нажмите ENTER)"); Console.ReadLine(); }
                     
-                }) // запрашиваем брони из бд
+                })
             };
-            var Button_south = new Buttons
+            var Button_new = new Buttons
             {
 
                 method = new Action(() =>
@@ -100,7 +102,7 @@ namespace Interface
                 }),
                 command = new Action(() => { s = Booking(x, y, s); })
             };
-            var Button_west = new Buttons
+            var Button_Exit = new Buttons
             {
                 method = new Action(() =>
                 {
@@ -114,7 +116,8 @@ namespace Interface
                     Process.GetCurrentProcess().Kill();
                 })
             };
-            var select = new ConsoleMenu(Button_north, Button_south, Button_west);
+
+            var select = new ConsoleMenu(Button_my, Button_new, Button_Exit);
 
             int line = 13;
             int column = 30;
@@ -145,8 +148,12 @@ namespace Interface
 
         public static User LogOn(int x, int y, string username, string password)
         {
-            do
+            while(true)
             {
+                TcpClient client = new("127.0.0.1", 7000);
+
+                NetworkStream stream = client.GetStream();
+
                 Console.Clear();
                 Console.SetCursorPosition(x, y);
                 Window_Main(x, y, 17, 43);//53
@@ -158,24 +165,42 @@ namespace Interface
                 Console.Write("(3-10 символов)");
                 Console.SetCursorPosition(x + 16, y + 7);
                 username = Console.ReadLine();
-                //Отсылаем в базу данных для проверки, что бы проверить не совпадает ли он с каким то из сущесвующих
-                Console.SetCursorPosition(x + 18, y + 9);
-                Console.Write("Пароль:");
-                Console.SetCursorPosition(x + 14, y + 10);
-                Console.Write("(5-10 символов)");
-                Console.SetCursorPosition(x + 16, y + 11);
-                password = Console.ReadLine();
-            }while (Checks.Checks.Check_Login(username) == false || Checks.Checks.Check_newPassword(password) == false);
-            //Тут отправляем в базу данных имя пользователя и пароль и база данных записывает в список юзеров
-            var user = new User(username, password);
-            return user;
+                if(Checks.Checks.Check_Login(username) == false) { continue; }
+                ReceivingAndSending.Sending(stream, "2/" + username);
+                string answer = ReceivingAndSending.Receiving(stream);
+                if (answer == "used")
+                {
+                    continue;
+                }
+                else
+                {
+                    Console.SetCursorPosition(x + 18, y + 9);
+                    Console.Write("Пароль:");
+                    Console.SetCursorPosition(x + 14, y + 10);
+                    Console.Write("(5-10 символов)");
+                    Console.SetCursorPosition(x + 16, y + 11);
+                    password = Console.ReadLine();
+                    if(Checks.Checks.Check_newPassword(password) == true) 
+                    { //Тут отправляем в базу данных имя пользователя и пароль и база данных записывает в список юзеров
+                        ReceivingAndSending.Sending(stream, $"3/{username}/{password}");
+                        var user = new User(username, password);
+                        return user;
+                    }
+                }
+            };  
         }
 
         public static User LogIn(int x, int y, string username, string password)
         {
-            string password_fromBase;
-            do
+            string password_fromBase = "";
+            int id;
+            int isAdmin;
+            while(true) 
             {
+                TcpClient client = new("127.0.0.1", 7000);
+
+                NetworkStream stream = client.GetStream();
+
                 Console.Clear();
                 Console.SetCursorPosition(x, y);
                 Window_Main(x, y, 17, 43);//53
@@ -187,17 +212,38 @@ namespace Interface
                 Console.Write("(3-10 символов)");
                 Console.SetCursorPosition(x + 16, y + 7);
                 username = Console.ReadLine();
-                //Отсылаем в базу данных для проверки, существует ли такой логин
-                Console.SetCursorPosition(x + 18, y + 9);
-                Console.Write("Пароль:");
-                Console.SetCursorPosition(x + 14, y + 10);
-                Console.Write("(5-10 символов)");
-                Console.SetCursorPosition(x + 16, y + 11);
-                password = Console.ReadLine();
-                password_fromBase = "Admin123";// тут база присылает пароль для сравнения
-            } while (Checks.Checks.Check_Login(username) == false || Checks.Checks.Check_Password(password, password_fromBase) == false);
-            var user = new User(username, password);
-            return user;
+                if (Checks.Checks.Check_Login(username) == false)
+                {
+                    continue;
+                }
+                ReceivingAndSending.Sending(stream, $"1/{username}");
+                string answer = ReceivingAndSending.Receiving(stream);
+                if (answer == "not found")
+                {
+                    continue;
+                }
+                else if (answer != "not found")
+                {
+                    //Отсылаем в базу данных для проверки, существует ли такой логин
+                    Console.SetCursorPosition(x + 18, y + 9);
+                    Console.Write("Пароль:");
+                    Console.SetCursorPosition(x + 14, y + 10);
+                    Console.Write("(5-10 символов)");
+                    Console.SetCursorPosition(x + 16, y + 11);
+                    password = Console.ReadLine();
+                    char[] delimiterChars = { ' ', '/', '\n' };
+                    string[] answer1 = answer.Split(delimiterChars, StringSplitOptions.RemoveEmptyEntries);
+                    id = int.Parse(answer1[0]);
+                    password_fromBase = answer1[1];
+                    isAdmin = int.Parse(answer1[2]);
+                    if (Checks.Checks.Check_Password(password, password_fromBase) == true)
+                    { 
+                        var user = new User(id, username, password, isAdmin);
+                        return user;
+                    }
+                }
+            }
+            
         }
 
         public static User LogIn_Or_LogOn(int x, int y, string username, string password, User user)//регистрация или вход

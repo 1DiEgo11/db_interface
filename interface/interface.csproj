@@ -10,6 +10,7 @@
     <ProjectReference Include="..\Button\Button.csproj" />
     <ProjectReference Include="..\Button_Selector\Button_Selector.csproj" />
     <ProjectReference Include="..\Checks\Checks.csproj" />
+    <ProjectReference Include="..\Client-Server\Client-Server.csproj" />
     <ProjectReference Include="..\Users\Users.csproj" />
   </ItemGroup>
 
