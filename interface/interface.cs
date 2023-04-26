@@ -119,7 +119,7 @@ namespace Interface
 
             var select = new ConsoleMenu(Button_my, Button_new, Button_Exit);
 
-            int line = 13;
+            int line = 17;
             int column = 30;
             int Y = y;
             Console.SetCursorPosition(x, y);
@@ -127,7 +127,7 @@ namespace Interface
             {
                 for (int j = 0; j < column; j++)
                 {
-                    if (i == 0 | j == 0 | i == line - 1 | j == column - 1 | i == 4 | i == 8)
+                    if (i == 0 | j == 0 | i == line - 1 | j == column - 1 | i == 4 | i == 8|i==12)
                     {
                         Console.Write('*');
                     }
@@ -515,6 +515,22 @@ namespace Interface
             select.Show();
             Console.Clear();
             return s;
-        }    
+        }
+
+        public static void Line(int x, int y)
+        {
+            Window_Main(x, y, 3, 45);
+            Console.SetCursorPosition(x + 2, y + 1);
+            Console.Write("ЧешиНаСевер Послезавтра 13:00-14:30 2-5");
+        }
+        public static void BottomButtoms(int x, int y)//где то (55.25)
+        {
+            Window_Button(x, y);
+            Console.SetCursorPosition(x + 4, y + 1);
+            Console.Write("Удалить");
+            Window_Button(x, y+3);
+            Console.SetCursorPosition(x + 5, y + 4);
+            Console.Write("Назад");
+        }
     }
 }
