@@ -15,8 +15,9 @@
             IsAdmin = 0;
             bookings = null;
         }
-        public User(string username, string password) 
+        public User(string id, string username, string password) 
         {
+            Id = int.Parse(id);
             name = username;
             this.password = password;
             IsAdmin = 0;

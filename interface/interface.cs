@@ -11,15 +11,87 @@ namespace Interface
    
     public class ConsoleInterface
     {
-        public static string Booking(int x, int y, string s)
+        public static void Line(int x, int y, User user)
         {
+            int X = x;
+            int Y = y;
+            Window_Main(x, y, 29, 80);
+            foreach (var book in user.bookings)
+            {
+                Console.SetCursorPosition(x + 2, y + 1);
+                Console.WriteLine(book.Restaurant + " " + book.Date + " " + book.Time + " " + book.Table);
+                y++;
+            }
+
+            var Button_del = new Buttons
+            {
+
+                method = new Action(() =>
+                {
+                    Console.SetCursorPosition(X + 4, Y + 1);
+                    Console.Write("Удалить");
+                }),
+                command = new Action(() => 
+                {
+                    Console.SetCursorPosition(x + 5, y + 4);
+                    Console.WriteLine("Выбирите строку которую хотели бы удалить: ");
+                    Console.SetCursorPosition(x + 49, y + 4);
+                    string s = Console.ReadLine();
+                    if (s != "\n" || s != " ")
+                    {
+                        while (int.Parse(s) > user.bookings.Count)
+                        {
+                            Console.WriteLine("Нет такой сттроки");
+                            s = Console.ReadLine();
+                        }
+                    }
+                    
+                    var book = user.bookings[int.Parse(s) - 1];
+                    s = book.Restaurant + "/" + book.Date + "/" + book.Time + "/" + book.Table;
+                    TcpClient client = new("127.0.0.1", 7000);
+
+                    NetworkStream stream = client.GetStream();
+
+                    s = $"6/{user.Id}/" + s;
+                    ReceivingAndSending.Sending(stream, s);
+                    user.bookings.Clear();
+                })
+            };
+            var Button_back = new Buttons
+            {
+                method = new Action(() =>
+                {
+                    Console.SetCursorPosition(X + 5, Y + 4);
+                    Console.Write("Назад");
+                }),
+                command = new Action(() =>
+                {
+                    return;
+                })
+            };
+
+            var select = new ConsoleMenu(Button_del, Button_back);
+            
+            X += 30;
+            Y += 19;
+
+            Window_Button(X, Y);
+           
+            Window_Button(X, Y + 3);
+
+            select.Show();
+        }
+        public static void Booking(int x, int y, string s, User user)
+        {
+            TcpClient client = new("127.0.0.1", 7000);
+
+            NetworkStream stream = client.GetStream();
             s = Restaurants(x, y, s);
             s = Date(x, y, s);
             s = Time(x, y, s);
             s = Table(x, y, s);
-            return s;
+            ReceivingAndSending.Sending(stream, $"5/{user.Id}/" + s);
         }
-
         public static void Window_Button(int x, int y)//отрисовка рамки для кнопки
         {
             int line = 3;
@@ -68,7 +140,7 @@ namespace Interface
             }
         }
 
-        public static string Dropdown_Menu(int x, int y, string s, User user)//выпадающее окно
+        public static void Dropdown_Menu(int x, int y, string s, User user)//выпадающее окно
         {
             var Button_my = new Buttons
             {
@@ -79,17 +151,42 @@ namespace Interface
                 }),
                 command = new Action(() => 
                 {
-                    Console.Clear();
-                    if ( user.bookings.Count > 0)
+                    user.bookings = new List<Booking>();
+                    TcpClient client = new("127.0.0.1", 7000);
+
+                    NetworkStream stream = client.GetStream();
+
+                    ReceivingAndSending.Sending(stream, $"4/{user.Id}");
+
+                    string booking = ReceivingAndSending.Receiving(stream);
+                    char[] delimiterChars = { ' ', '/', '\n' };
+                    string[] bookings = booking.Split(delimiterChars, StringSplitOptions.RemoveEmptyEntries);
+
+                    if (booking == " ")
                     {
-                        foreach (var book in user.bookings)
-                        {
-                            Console.WriteLine(book.Restaurant + " " + book.Date + " " + book.Time + " " + book.Table);
-                        }
-                        Console.ReadLine();
+                        Console.Clear();
+                        Console.WriteLine("У вас нет броней(Нажмите ENTER)"); Console.ReadLine();
                     }
-                    else { Console.WriteLine("У вас нет броней(Нажмите ENTER)"); Console.ReadLine(); }
-                    
+                    else
+                    {
+                        if (bookings[0] != "" || bookings[0] != " ")
+                        {
+                            for (int i = 0; i < bookings.Length; i += 4)
+                            {
+                                var book = new Booking
+                                {
+                                    Restaurant = bookings[i],
+                                    Date = bookings[i + 1],
+                                    Time = bookings[i + 2],
+                                    Table = bookings[i + 3],
+                                };
+                                user.bookings.Add(book);
+                            }
+                        }
+                        Line(x, y, user);
+                    }
+
+                    Console.Clear();
                 })
             };
             var Button_new = new Buttons
@@ -100,7 +197,7 @@ namespace Interface
                     Console.SetCursorPosition(x + 3, y + 6);
                     Console.Write("Новая бронь");
                 }),
-                command = new Action(() => { s = Booking(x, y, s); })
+                command = new Action(() => { Booking(x, y, s, user); })
             };
             var Button_Exit = new Buttons
             {
@@ -119,7 +216,7 @@ namespace Interface
 
             var select = new ConsoleMenu(Button_my, Button_new, Button_Exit);
 
-            int line = 13;
+            int line = 17;
             int column = 30;
             int Y = y;
             Console.SetCursorPosition(x, y);
@@ -127,7 +224,7 @@ namespace Interface
             {
                 for (int j = 0; j < column; j++)
                 {
-                    if (i == 0 | j == 0 | i == line - 1 | j == column - 1 | i == 4 | i == 8)
+                    if (i == 0 | j == 0 | i == line - 1 | j == column - 1 | i == 4 | i == 8 | i == 12)
                     {
                         Console.Write('*');
                     }
@@ -143,11 +240,11 @@ namespace Interface
 
             select.Show();
             Console.Clear();
-            return s;
         }
 
         public static User LogOn(int x, int y, string username, string password)
         {
+            
             while(true)
             {
                 TcpClient client = new("127.0.0.1", 7000);
@@ -168,12 +265,14 @@ namespace Interface
                 if(Checks.Checks.Check_Login(username) == false) { continue; }
                 ReceivingAndSending.Sending(stream, "2/" + username);
                 string answer = ReceivingAndSending.Receiving(stream);
-                if (answer == "used")
+                string[] answers = answer.Split(new char[] {'/', '\n', ' '}, StringSplitOptions.RemoveEmptyEntries);
+                if (answers[0] == "used")
                 {
                     continue;
                 }
                 else
                 {
+                    string id = answers[2];
                     Console.SetCursorPosition(x + 18, y + 9);
                     Console.Write("Пароль:");
                     Console.SetCursorPosition(x + 14, y + 10);
@@ -181,9 +280,14 @@ namespace Interface
                     Console.SetCursorPosition(x + 16, y + 11);
                     password = Console.ReadLine();
                     if(Checks.Checks.Check_newPassword(password) == true) 
-                    { //Тут отправляем в базу данных имя пользователя и пароль и база данных записывает в список юзеров
-                        ReceivingAndSending.Sending(stream, $"3/{username}/{password}");
-                        var user = new User(username, password);
+                    {
+                        
+                        TcpClient client1 = new("127.0.0.1", 7000);
+
+                        NetworkStream stream1 = client1.GetStream();
+
+                        ReceivingAndSending.Sending(stream1, "3/" + id + "/" + username + "/" + password);
+                        var user = new User(id,username, password);
                         return user;
                     }
                 }
