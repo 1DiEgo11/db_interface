@@ -11,16 +11,27 @@ namespace Interface
    
     public class ConsoleInterface
     {
-        public static void Line(int x, int y, User user)
+        public static void Line(int x, int y, User user, string[] users)
         {
             int X = x;
             int Y = y;
+            int i = 0;
             Window_Main(x, y, 29, 80);
             foreach (var book in user.bookings)
             {
-                Console.SetCursorPosition(x + 2, y + 1);
-                Console.WriteLine(book.Restaurant + " " + book.Date + " " + book.Time + " " + book.Table);
-                y++;
+                if (users.Length > 0)
+                {
+                    Console.SetCursorPosition(x + 2, y + 1);
+                    Console.WriteLine(users[i] + " " + book.Restaurant + " " + book.Date + " " + book.Time + " " + book.Table);
+                    y++;
+                    i++;
+                }
+                else
+                {
+                    Console.SetCursorPosition(x + 2, y + 1);
+                    Console.WriteLine(book.Restaurant + " " + book.Date + " " + book.Time + " " + book.Table);
+                    y++;
+                }
             }
 
             var Button_del = new Buttons
@@ -37,23 +48,28 @@ namespace Interface
                     Console.WriteLine("Выбирите строку которую хотели бы удалить: ");
                     Console.SetCursorPosition(x + 49, y + 4);
                     string s = Console.ReadLine();
+                    string s1 = "";
                     if (s != "\n" || s != " ")
                     {
                         while (int.Parse(s) > user.bookings.Count)
                         {
-                            Console.WriteLine("Нет такой сттроки");
+                            Console.WriteLine("Нет такой строки");
                             s = Console.ReadLine();
                         }
                     }
                     
                     var book = user.bookings[int.Parse(s) - 1];
-                    s = book.Restaurant + "/" + book.Date + "/" + book.Time + "/" + book.Table;
+                    s1 = book.Restaurant + "/" + book.Date + "/" + book.Time + "/" + book.Table;
+
                     TcpClient client = new("127.0.0.1", 7000);
 
                     NetworkStream stream = client.GetStream();
-
-                    s = $"6/{user.Id}/" + s;
-                    ReceivingAndSending.Sending(stream, s);
+                    if (users.Length > 0)
+                    {
+                        s1 = $"6/{users[int.Parse(s) - 1]}/" + s1;
+                    }
+                    else { s1 = $"6/{user.Id}/" + s; }
+                    ReceivingAndSending.Sending(stream, s1);
                     user.bookings.Clear();
                 })
             };
@@ -81,6 +97,7 @@ namespace Interface
 
             select.Show();
         }
+        
         public static void Booking(int x, int y, string s, User user)
         {
             TcpClient client = new("127.0.0.1", 7000);
@@ -92,6 +109,7 @@ namespace Interface
             s = Table(x, y, s);
             ReceivingAndSending.Sending(stream, $"5/{user.Id}/" + s);
         }
+
         public static void Window_Button(int x, int y)//отрисовка рамки для кнопки
         {
             int line = 3;
@@ -156,12 +174,12 @@ namespace Interface
 
                     NetworkStream stream = client.GetStream();
 
-                    ReceivingAndSending.Sending(stream, $"4/{user.Id}");
+                    ReceivingAndSending.Sending(stream, $"4/{user.Id}/{user.IsAdmin}/0");
 
                     string booking = ReceivingAndSending.Receiving(stream);
                     char[] delimiterChars = { ' ', '/', '\n' };
                     string[] bookings = booking.Split(delimiterChars, StringSplitOptions.RemoveEmptyEntries);
-
+                    string[] logins = Array.Empty<string>();
                     if (booking == " ")
                     {
                         Console.Clear();
@@ -183,7 +201,7 @@ namespace Interface
                                 user.bookings.Add(book);
                             }
                         }
-                        Line(x, y, user);
+                        Line(x, y, user, logins);
                     }
 
                     Console.Clear();
@@ -213,8 +231,66 @@ namespace Interface
                     Process.GetCurrentProcess().Kill();
                 })
             };
-
             var select = new ConsoleMenu(Button_my, Button_new, Button_Exit);
+
+            if (user.IsAdmin == 1)
+            {
+                var Button_Admin = new Buttons
+                {
+                    method = new Action(() =>
+                    {
+                        Console.SetCursorPosition(x + 3, y + 14);
+                        Console.Write("Все брони");
+                    }),
+                    command = new Action(() =>
+                    {
+                        TcpClient client = new("127.0.0.1", 7000);
+
+                        NetworkStream stream = client.GetStream();
+
+                        ReceivingAndSending.Sending(stream, $"4/{user.Id}/{user.IsAdmin}/1");
+
+                        user.bookings = new List<Booking>();
+                        string booking = ReceivingAndSending.Receiving(stream);
+                        char[] delimiterChars = { ' ', '/', '\n' };
+                        string[] bookings = booking.Split(delimiterChars, StringSplitOptions.RemoveEmptyEntries);
+                        string[] logins = new string[bookings.Length];
+
+
+                        int j = 0;
+                        if (booking == " ")
+                        {
+                            Console.Clear();
+                            Console.WriteLine("Броней нет!(Нажмите ENTER)"); Console.ReadLine();
+                        }
+                        else
+                        {
+                            if (bookings[0] != "" || bookings[0] != " ")
+                            {
+                                for (int i = 0; i < bookings.Length; i += 5)
+                                {
+                                    logins[j] = bookings[i];
+                                    var book = new Booking
+                                    {
+                                        Restaurant = bookings[i + 1],
+                                        Date = bookings[i + 2],
+                                        Time = bookings[i + 3],
+                                        Table = bookings[i + 4],
+                                    };
+                                    user.bookings.Add(book);
+                                    j++;
+                                }
+                            }
+                            Line(x, y, user, logins);
+                        }
+
+                        Console.Clear();
+                    })
+                };
+                select = new ConsoleMenu(Button_my, Button_new, Button_Exit, Button_Admin);
+            }
+
+            
 
             int line = 17;
             int column = 30;
